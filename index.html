@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10251f">
+  <meta name="description" content="Free, practical calculators for small businesses. Calculate profit margin, markup, break-even points, selling prices and ecommerce profit with clear formulas.">
+  <title>BusinessCalc Hub — Free Business & Ecommerce Calculators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="./" aria-label="BusinessCalc Hub home"><span class="brand-mark">B</span><span>businesscalc<span class="brand-muted">hub</span></span></a>
+      <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span></button>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#tools">Calculators</a><a href="#how-it-works">How it works</a><a href="#about">About</a>
+        <a class="nav-cta" href="#tools">Explore tools <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Practical tools for smarter business</div>
+          <h1>Make the numbers<br><span>work for you.</span></h1>
+          <p class="hero-lede">Straightforward calculators for pricing, profit and everyday business decisions. Get a useful answer, understand the formula, and get back to work.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#tools">Explore free calculators <span>→</span></a><a class="text-link" href="#how-it-works">See how it works <span>↓</span></a></div>
+          <div class="hero-proof"><div class="proof-avatars"><span>✓</span><span>+</span><span>↗</span></div><p><strong>Free to use.</strong> No account or file upload required.</p></div>
+        </div>
+        <div class="hero-visual" aria-label="Illustration of a business calculation result">
+          <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
+          <div class="floating-chip chip-top"><span class="chip-icon">↗</span><span><small>Gross margin</small><strong>32.5%</strong></span></div>
+          <div class="result-card">
+            <div class="result-card-head"><span class="mini-label">QUICK PROFIT SNAPSHOT</span><span class="live-dot">●</span></div>
+            <div class="result-number">$1,625<span>.00</span></div><div class="result-caption">Gross profit</div>
+            <div class="result-divider"></div>
+            <div class="result-row"><span>Revenue</span><strong>$5,000.00</strong></div>
+            <div class="result-row"><span>Costs</span><strong>$3,375.00</strong></div>
+            <div class="result-bar"><span></span></div>
+            <div class="result-foot"><span>Illustrative example</span><span class="trend">↗ 32.5% margin</span></div>
+          </div>
+          <div class="floating-chip chip-bottom"><span class="spark-icon">✳</span><span><small>Built for clarity</small><strong>Simple inputs. Clear results.</strong></span></div>
+          <div class="visual-decoration deco-cross">✳</div><div class="visual-decoration deco-circle"></div>
+        </div>
+      </div>
+      <div class="container hero-bottom"><span>BUILT FOR THE EVERYDAY BUSINESS DECISIONS</span><div><span>PRICING</span><i></i><span>PROFIT</span><i></i><span>GROWTH</span><i></i><span>OPERATIONS</span></div></div>
+    </section>
+
+    <section class="section tools-section" id="tools">
+      <div class="container">
+        <div class="section-heading">
+          <div><div class="eyebrow eyebrow-light">THE TOOLKIT</div><h2>Useful answers, <span>without the spreadsheet maze.</span></h2><p>Choose a calculator, enter your numbers and see the result instantly.</p></div>
+          <div class="tool-search"><span>⌕</span><input id="tool-search" type="search" placeholder="Find a calculator..." aria-label="Search calculators"><kbd>/</kbd></div>
+        </div>
+        <div class="category-row" role="group" aria-label="Filter calculators">
+          <button class="filter-chip active" data-filter="all">All tools <span>5</span></button>
+          <button class="filter-chip" data-filter="pricing">Pricing & profit</button>
+          <button class="filter-chip" data-filter="ecommerce">Ecommerce</button>
+          <button class="filter-chip" data-filter="planning">Planning</button>
+        </div>
+        <div class="tool-grid" id="tool-grid">
+          <a class="tool-card" data-category="pricing" data-search="profit margin calculator gross margin percentage" href="tools/profit-margin-calculator/">
+            <div class="tool-icon icon-green">％</div><div class="tool-card-top"><span class="tool-tag">PRICING & PROFIT</span><span class="card-arrow">↗</span></div><h3>Profit Margin Calculator</h3><p>Find your gross profit and margin from cost and selling price.</p><div class="tool-card-foot"><span>Instant calculation</span><span>Open tool →</span></div>
+          </a>
+          <a class="tool-card" data-category="pricing" data-search="markup calculator cost price percentage" href="tools/markup-calculator/">
+            <div class="tool-icon icon-lilac">⌁</div><div class="tool-card-top"><span class="tool-tag">PRICING & PROFIT</span><span class="card-arrow">↗</span></div><h3>Markup Calculator</h3><p>Calculate markup percentage or work backwards to a selling price.</p><div class="tool-card-foot"><span>Two-way calculator</span><span>Open tool →</span></div>
+          </a>
+          <a class="tool-card" data-category="planning" data-search="break even calculator fixed costs variable costs units" href="tools/break-even-calculator/">
+            <div class="tool-icon icon-peach">⌖</div><div class="tool-card-top"><span class="tool-tag">BUSINESS PLANNING</span><span class="card-arrow">↗</span></div><h3>Break-even Calculator</h3><p>See how many units you need to sell before you cover your costs.</p><div class="tool-card-foot"><span>Units & revenue</span><span>Open tool →</span></div>
+          </a>
+          <a class="tool-card" data-category="pricing" data-search="selling price calculator target margin cost" href="tools/selling-price-calculator/">
+            <div class="tool-icon icon-blue">↗</div><div class="tool-card-top"><span class="tool-tag">PRICING & PROFIT</span><span class="card-arrow">↗</span></div><h3>Selling Price Calculator</h3><p>Set a price from your unit cost and target profit margin.</p><div class="tool-card-foot"><span>Target-margin pricing</span><span>Open tool →</span></div>
+          </a>
+          <a class="tool-card" data-category="ecommerce" data-search="ecommerce profit calculator fees shipping advertising cost" href="tools/ecommerce-profit-calculator/">
+            <div class="tool-icon icon-yellow">▦</div><div class="tool-card-top"><span class="tool-tag">ECOMMERCE</span><span class="card-arrow">↗</span></div><h3>Ecommerce Profit Calculator</h3><p>Estimate per-order profit after product, shipping, fees and ad costs.</p><div class="tool-card-foot"><span>Per-order breakdown</span><span>Open tool →</span></div>
+          </a>
+        </div>
+        <div class="empty-state" id="empty-state" hidden>No calculators match that search. Try a different term.</div>
+        <div class="section-note"><span class="note-icon">✳</span><p><strong>More tools are on the roadmap.</strong> We’re building this toolkit around real small-business workflows, one useful calculator at a time.</p></div>
+      </div>
+    </section>
+
+    <section class="section value-section" id="how-it-works">
+      <div class="container value-grid">
+        <div class="value-intro"><div class="eyebrow eyebrow-light">MADE TO BE USEFUL</div><h2>Less guesswork.<br><span>More confidence.</span></h2><p>Business decisions can be complicated. The tools shouldn’t be. BusinessCalc Hub focuses on clear inputs, transparent formulas and results you can understand.</p><a class="text-link dark-link" href="#tools">Find your calculator <span>→</span></a></div>
+        <div class="value-points">
+          <article class="value-point"><div class="value-number">01</div><div><h3>Enter your numbers</h3><p>Use the fields that match your situation. No account or complicated setup.</p></div></article>
+          <article class="value-point"><div class="value-number">02</div><div><h3>Get an instant result</h3><p>Calculations happen in your browser, so your inputs stay on your device.</p></div></article>
+          <article class="value-point"><div class="value-number">03</div><div><h3>Understand the formula</h3><p>Each tool explains what it calculates, how the formula works and what to watch for.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section about-section" id="about">
+      <div class="container about-inner"><div class="about-symbol">B<span>.</span></div><div><div class="eyebrow eyebrow-light">A CLEARER WAY TO CALCULATE</div><h2>Built for people<br>building businesses.</h2><p>BusinessCalc Hub is an independent collection of practical calculators for owners, operators and people working on their next idea. Our aim is simple: make everyday business maths easier to use and easier to understand.</p></div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-top"><a class="brand brand-footer" href="./"><span class="brand-mark">B</span><span>businesscalc<span class="brand-muted">hub</span></span></a><p>Clear calculations for better business decisions.</p><nav><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></nav></div><div class="container footer-bottom"><span>© <span id="year"></span> BusinessCalc Hub</span><span>Free tools. Transparent formulas.</span></div></footer>
+</body>
+</html>
