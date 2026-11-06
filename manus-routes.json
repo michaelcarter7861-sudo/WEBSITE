@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "path": "/", "title": "RowReady CSV Import Checker" },
+    { "path": "/guides/csv-import-checklist/", "title": "CSV Import Checklist" },
+    { "path": "/guides/shopify-csv-safety/", "title": "Shopify CSV Safety Guide" },
+    { "path": "/privacy/", "title": "RowReady Privacy Notes" },
+    { "path": "/about/", "title": "About RowReady" }
+  ]
+}

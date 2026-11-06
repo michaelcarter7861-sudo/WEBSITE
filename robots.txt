@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-# Sitemap URL will be added after the production hostname is confirmed.
