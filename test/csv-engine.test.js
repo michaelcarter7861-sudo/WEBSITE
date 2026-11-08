@@ -80,10 +80,10 @@ test("Shopify profile surfaces the documented option-column dependency", () => {
 });
 
 test("Shopify profile accepts current and legacy header names", () => {
-  const current = analyzeCSV(parseCSV("URL handle,Title,SKU,Price\\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
+  const current = analyzeCSV(parseCSV("URL handle,Title,SKU,Price\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
   assert.ok(current.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
   assert.ok(!current.issues.some((issue) => issue.kind === "shopify-header"));
-  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant SKU,Variant Price\\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
+  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant SKU,Variant Price\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
   assert.ok(legacy.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
   assert.ok(!legacy.issues.some((issue) => issue.kind === "shopify-header"));
   const rules = makeDefaultRules(["URL handle", "Title", "SKU", "Price"], "shopify");
@@ -115,4 +115,11 @@ test("serialized CSV round-trips quotes, commas, line breaks, tabs and empty cel
   const result = parseCSV(stringifyCSV(rows));
   assert.deepEqual(result.rows, rows);
   assert.deepEqual(result.syntaxIssues, []);
+});
+
+test("Shopify profile recognizes current plural Barcodes and legacy Variant Barcode headers", () => {
+  const current = analyzeCSV(parseCSV("URL handle,Title,Barcodes\\nitem,Thing,123"), { profile: "shopify" });
+  assert.ok(current.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
+  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant Barcode\\nitem,Thing,123"), { profile: "shopify" });
+  assert.ok(legacy.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
 });
