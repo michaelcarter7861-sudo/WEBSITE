@@ -275,6 +275,7 @@ export function compareCSVData(baseline, incoming, baselineKeyIndex, incomingKey
 
   const duplicateKeys = [];
   const blockedKeys = new Set();
+  const duplicateReported = new Set();
   const makeMap = (side, keyIndex, label) => {
     const map = new Map();
     const firstRows = new Map();
@@ -287,7 +288,11 @@ export function compareCSVData(baseline, incoming, baselineKeyIndex, incomingKey
       }
       if (map.has(key)) {
         blockedKeys.add(key);
-        duplicateKeys.push({ side: label, key, row: firstRows.get(key), reason: "duplicate key" });
+        const reportKey = label + "\\u0000" + key;
+        if (!duplicateReported.has(reportKey)) {
+          duplicateKeys.push({ side: label, key, row: firstRows.get(key), reason: "duplicate key" });
+          duplicateReported.add(reportKey);
+        }
         duplicateKeys.push({ side: label, key, row: rowNumber, reason: "duplicate key" });
         return;
       }
