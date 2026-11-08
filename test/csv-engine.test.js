@@ -118,8 +118,8 @@ test("serialized CSV round-trips quotes, commas, line breaks, tabs and empty cel
 });
 
 test("Shopify profile recognizes current plural Barcodes and legacy Variant Barcode headers", () => {
-  const current = analyzeCSV(parseCSV("URL handle,Title,Barcodes\\nitem,Thing,123"), { profile: "shopify" });
+  const current = analyzeCSV(parseCSV("URL handle,Title,Barcodes\nitem,Thing,123"), { profile: "shopify" });
   assert.ok(current.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
-  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant Barcode\\nitem,Thing,123"), { profile: "shopify" });
+  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant Barcode\nitem,Thing,123"), { profile: "shopify" });
   assert.ok(legacy.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
 });
