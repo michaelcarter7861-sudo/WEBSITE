@@ -79,6 +79,18 @@ test("Shopify profile surfaces the documented option-column dependency", () => {
   assert.ok(analysis.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
 });
 
+test("Shopify profile accepts current and legacy header names", () => {
+  const current = analyzeCSV(parseCSV("URL handle,Title,SKU,Price\\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
+  assert.ok(current.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
+  assert.ok(!current.issues.some((issue) => issue.kind === "shopify-header"));
+  const legacy = analyzeCSV(parseCSV("Handle,Title,Variant SKU,Variant Price\\nitem,Thing,sku-1,12.50"), { profile: "shopify" });
+  assert.ok(legacy.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
+  assert.ok(!legacy.issues.some((issue) => issue.kind === "shopify-header"));
+  const rules = makeDefaultRules(["URL handle", "Title", "SKU", "Price"], "shopify");
+  assert.equal(rules.SKU.trim, true);
+  assert.equal(rules.Price.type, "number");
+});
+
 test("default contact and catalog profiles create relevant column rules", () => {
   const contacts = makeDefaultRules(["Name", "Email"], "contacts");
   assert.equal(contacts.Email.type, "email");
