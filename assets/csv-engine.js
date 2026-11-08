@@ -262,6 +262,92 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
   return { headers, dataRows, rowLines, issues, effectiveRules, profile, delimiter: parsed.delimiter, stats: { rows: dataRows.length, columns: headers.length, emptyRows, duplicateRows, errors, warnings } };
 }
 
+
+export function compareCSVData(baseline, incoming, baselineKeyIndex, incomingKeyIndex) {
+  const validateSide = (side, name, keyIndex) => {
+    if (!side || !Array.isArray(side.headers) || !Array.isArray(side.rows)) throw new Error(`Invalid ${name} comparison data.`);
+    if (!Number.isInteger(keyIndex) || keyIndex < 0 || keyIndex >= side.headers.length) throw new Error(`Choose a valid key column for the ${name} file.`);
+    const malformed = side.rows.findIndex((row) => !Array.isArray(row) || row.length !== side.headers.length);
+    if (malformed >= 0) throw new Error(`${name} file row ${malformed + 2} has a different number of fields than its header.`);
+  };
+  validateSide(baseline, "baseline", baselineKeyIndex);
+  validateSide(incoming, "incoming", incomingKeyIndex);
+
+  const duplicateKeys = [];
+  const blockedKeys = new Set();
+  const makeMap = (side, keyIndex, label) => {
+    const map = new Map();
+    const firstRows = new Map();
+    side.rows.forEach((row, index) => {
+      const key = String(row[keyIndex] ?? "").trim();
+      const rowNumber = index + 2;
+      if (!key) {
+        duplicateKeys.push({ side: label, key: "", row: rowNumber, reason: "blank key" });
+        return;
+      }
+      if (map.has(key)) {
+        blockedKeys.add(key);
+        duplicateKeys.push({ side: label, key, row: firstRows.get(key), reason: "duplicate key" });
+        duplicateKeys.push({ side: label, key, row: rowNumber, reason: "duplicate key" });
+        return;
+      }
+      map.set(key, row);
+      firstRows.set(key, rowNumber);
+    });
+    return map;
+  };
+
+  const baselineMap = makeMap(baseline, baselineKeyIndex, "baseline");
+  const incomingMap = makeMap(incoming, incomingKeyIndex, "incoming");
+  for (const key of blockedKeys) {
+    baselineMap.delete(key);
+    incomingMap.delete(key);
+  }
+
+  const commonColumns = baseline.headers
+    .map((name, index) => ({
+      name,
+      index,
+      other: incoming.headers.findIndex((item) => String(item).trim().toLowerCase() === String(name).trim().toLowerCase())
+    }))
+    .filter((item) => item.other >= 0);
+  const added = [];
+  const removed = [];
+  const changes = [];
+  for (const [key, row] of incomingMap) {
+    if (!baselineMap.has(key)) {
+      added.push({ key });
+      continue;
+    }
+    const before = baselineMap.get(key);
+    for (const column of commonColumns) {
+      if (column.index === baselineKeyIndex || column.other === incomingKeyIndex) continue;
+      const oldValue = String(before[column.index] ?? "");
+      const newValue = String(row[column.other] ?? "");
+      if (oldValue !== newValue) changes.push({ status: "changed", key, column: column.name, before: oldValue, after: newValue });
+    }
+  }
+  for (const key of baselineMap.keys()) if (!incomingMap.has(key)) removed.push({ key });
+  const changedRecords = new Set(changes.map((item) => item.key)).size;
+  const matchedCount = [...baselineMap.keys()].filter((key) => incomingMap.has(key)).length;
+  return {
+    added,
+    removed,
+    changes,
+    changedRecords,
+    unchanged: Math.max(0, matchedCount - changedRecords),
+    duplicateKeys,
+    baselineCount: baseline.rows.length,
+    incomingCount: incoming.rows.length,
+    baseKeyName: baseline.headers[baselineKeyIndex],
+    incomingKeyName: incoming.headers[incomingKeyIndex],
+    baselineHeaders: baseline.headers,
+    incomingHeaders: incoming.headers,
+    addedHeaders: incoming.headers.filter((header) => !baseline.headers.some((item) => String(item).trim().toLowerCase() === String(header).trim().toLowerCase())),
+    removedHeaders: baseline.headers.filter((header) => !incoming.headers.some((item) => String(item).trim().toLowerCase() === String(header).trim().toLowerCase()))
+  };
+}
+
 export function applySafeFixes(rows, headers, rules, { trim = false, removeEmpty = false } = {}) {
   return rows
     .filter((cells) => !(removeEmpty && cells.every((cell) => blank(cell))))
