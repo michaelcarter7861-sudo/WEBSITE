@@ -59,7 +59,7 @@ test("validates user-selected types, uniqueness, and strict ISO calendar dates",
 
 test("numeric validation rejects malformed comma grouping but accepts valid grouped values", () => {
   const analysis = analyzeCSV(
-    parseCSV('amount,whole\\n"1,234.50","1,234"\\n"1,2","1,2"\\n"12,34.5","12,34"'),
+    parseCSV('amount,whole\n"1,234.50","1,234"\n"1,2","1,2"\n"12,34.5","12,34"'),
     { hasHeader: true, rules: { amount: { type: "number" }, whole: { type: "integer" } } }
   );
   const invalidAmountRows = analysis.issues.filter((issue) => issue.kind === "type" && issue.column === "amount").map((issue) => issue.row);
