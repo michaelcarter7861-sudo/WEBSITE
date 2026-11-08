@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Run CSV regression tests
+        run: npm test
       - name: Configure Pages metadata
         uses: actions/configure-pages@v5
       - name: Build static site

@@ -37,6 +37,12 @@ GitHub's docs note that a project site lives under `/<repositoryname>/`; the bui
 - Compare two CSVs by user-selected key and download a change report.
 - English crawlable landing page, two original guides, privacy and about pages, FAQ content, structured data, route manifest and origin-aware SEO file generation.
 
+## Quality checks and open-source practice
+
+Run `npm test` to exercise the CSV parser and exporter with regression cases for quoted commas, doubled quotes, embedded newlines, delimiters, malformed quotes, row widths, duplicate headers/records, user-selected validation rules, Shopify warnings, safe fixes and round-trip serialization. The cases reflect common parser edge cases represented in the open-source [CSV Spectrum](https://github.com/max-mapper/csv-spectrum) project; this repository does not copy its fixtures or depend on it at runtime. The GitHub Pages workflow runs the suite before publishing. A Lighthouse audit of the published homepage scored 100 for performance, 97 for accessibility, 96 for best practices and 100 for SEO on 8 November 2026; Lighthouse identified small muted labels below contrast guidance, now darkened in the stylesheet. Audits are snapshots, not ranking guarantees.
+
+This site stays dependency-free in production. Open-source libraries should be adopted only when they solve a measured product problem; adding code, scripts or schema without a user benefit can increase maintenance and create accessibility, privacy, licensing or search-policy risks. Google's current guidance for AI search emphasizes the same crawlable, useful, people-first pages as regular Search, not special AI markup or ranking hacks. See [Google's AI features guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide) and [structured-data policies](https://developers.google.com/search/docs/appearance/structured-data/sd-policies).
+
 ## Limits and scope
 
 The current app accepts CSV/TSV files up to 10 MB. Browser memory and performance vary. The Shopify profile checks a limited set of common headers and one documented variant-column dependency; it does not read a Shopify store, cover every version or import rule, or guarantee acceptance. The comparison report includes changed values when the user downloads it. Always keep a backup and review the destination's own import preview.

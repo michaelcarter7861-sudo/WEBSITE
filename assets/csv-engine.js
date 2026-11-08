@@ -118,10 +118,6 @@ export function parseCSV(input, delimiter = "auto") {
     syntaxIssues.push({ severity: "error", kind: "quote", row: rowStartLine, column: "", message: "A quoted field was never closed.", suggestion: "Close the quote or escape an internal quote by doubling it, then check the rows after this point." });
   }
   if (sawAny || row.length || field.length || quoteClosed) pushRow();
-  if (rows.length && rows[rows.length - 1].every((cell) => cell === "") && /(?:\r\n|\r|\n)$/.test(text)) {
-    rows.pop();
-    rowLines.pop();
-  }
   return { rows, rowLines, delimiter: sep, syntaxIssues, lineCount: line };
 }
 

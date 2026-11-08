@@ -513,7 +513,7 @@ h1,h2,h3,p {
 }
 .section-intro {
   max-width:540px;
-  color:#617069;
+  color:#4b5751;
   margin:0;
   font-size:14px
 }
@@ -545,7 +545,7 @@ h1,h2,h3,p {
 }
 .local-badge small {
   font-size:9px;
-  color:#75817b;
+  color:#53615a;
   margin-top:2px
 }
 .app-shell {
@@ -574,7 +574,7 @@ h1,h2,h3,p {
   border:0;
   border-bottom:2px solid transparent;
   background:transparent;
-  color:#75817a;
+  color:#53615a;
   font-size:12px;
   font-weight:700
 }
@@ -585,7 +585,7 @@ h1,h2,h3,p {
 .tab-number {
   font-family:ui-monospace,monospace;
   font-size:9px;
-  color:#98a39b
+  color:#56635b
 }
 .app-tab.is-active .tab-number {
   color:var(--green)
@@ -593,7 +593,7 @@ h1,h2,h3,p {
 .tab-note {
   align-self:center;
   margin-left:auto;
-  color:#78857d;
+  color:#536057;
   font-size:10px
 }
 .app-panel {
@@ -646,7 +646,7 @@ h1,h2,h3,p {
 }
 .drop-zone p {
   margin:1px 0 13px;
-  color:#718079;
+  color:#52615a;
   font-size:11px
 }
 .inline-button {
@@ -677,7 +677,7 @@ h1,h2,h3,p {
   gap:8px;
   align-items:center;
   padding-top:14px;
-  color:#87918a;
+  color:#53615a;
   font-size:10px
 }
 .sample-button {
@@ -712,7 +712,7 @@ h1,h2,h3,p {
 }
 .profile-caption {
   margin:9px 0 13px;
-  color:#7b8880;
+  color:#526057;
   font-size:10px;
   line-height:1.55
 }
@@ -952,7 +952,7 @@ h1,h2,h3,p {
 }
 .finding p {
   font-size:10px;
-  color:#75817a;
+  color:#53615a;
   margin:3px 0 0;
   line-height:1.5
 }
@@ -1346,7 +1346,7 @@ h1,h2,h3,p {
   position:absolute;
   right:19px;
   top:19px;
-  color:#9aa59d;
+  color:#536058;
   font:700 10px ui-monospace,monospace
 }
 .step-icon {
@@ -1377,7 +1377,7 @@ h1,h2,h3,p {
 }
 .step-card p {
   font-size:12px;
-  color:#6d7a72;
+  color:#505d56;
   line-height:1.7;
   margin:0;
   max-width:300px
@@ -1430,7 +1430,7 @@ h1,h2,h3,p {
 }
 .check-list p {
   font-size:11px;
-  color:#758078;
+  color:#536057;
   margin:0;
   line-height:1.55
 }
@@ -1541,7 +1541,7 @@ h1,h2,h3,p {
   font-size:39px
 }
 .faq-title>p:last-child {
-  color:#6e7a73;
+  color:#505d56;
   font-size:12px
 }
 .faq-list details {
@@ -1613,7 +1613,7 @@ h1,h2,h3,p {
 }
 .site-footer>p {
   margin:0;
-  color:#78857d;
+  color:#536057;
   font-size:10px
 }
 .site-footer nav {
@@ -1627,7 +1627,7 @@ h1,h2,h3,p {
 }
 .site-footer>small {
   grid-column:1/-1;
-  color:#8a948d;
+  color:#536057;
   font-size:9px;
   border-top:1px solid #dfe4dd;
   padding-top:12px
