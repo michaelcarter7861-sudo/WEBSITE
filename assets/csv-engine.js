@@ -237,10 +237,10 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
   });
 
   if (profile === "shopify") {
-    const handleIndex = headerMap.get("url handle");
+    const handleIndex = headerMap.get("url handle") ?? headerMap.get("handle");
     const titleIndex = headerMap.get("title");
-    if (handleIndex === undefined) addIssue(issues, { severity: "error", kind: "shopify-header", row: 1, column: "URL handle", message: "The Shopify product update profile did not find a “URL handle” column.", suggestion: "Check the current Shopify product CSV template and confirm this is an update file." });
-    if (titleIndex === undefined) addIssue(issues, { severity: "error", kind: "shopify-header", row: 1, column: "Title", message: "The Shopify product update profile did not find a “Title” column.", suggestion: "Check the current Shopify product CSV template and confirm this is an update file." });
+    if (handleIndex === undefined) addIssue(issues, { severity: "error", kind: "shopify-header", row: 1, column: "URL handle", message: "The Shopify product update profile did not find a “URL handle” (or legacy “Handle”) column.", suggestion: "For updates, include URL handle and Title. Shopify also accepts the legacy Handle heading." });
+    if (titleIndex === undefined) addIssue(issues, { severity: "error", kind: "shopify-header", row: 1, column: "Title", message: "The Shopify product update profile did not find a “Title” column.", suggestion: "Include the Title column from Shopify's product CSV template." });
     if (handleIndex !== undefined) {
       dataRows.forEach((cells, i) => {
         const handle = String(cells[handleIndex] ?? "").trim();
@@ -249,33 +249,10 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
     }
     const option1Name = headerMap.has("option1 name");
     const option1Value = headerMap.has("option1 value");
-    const variantFieldPresent = headers.some((name) => /variant\s+(sku|price|grams|weight|barcode)/i.test(name));
+    const variantFieldPresent = headers.some((name) => /^(sku|price|weight value \(grams\)|barcode|variant\s+(sku|price|grams|weight|barcode))$/i.test(name.trim()));
     if (variantFieldPresent && (!option1Name || !option1Value)) {
       addIssue(issues, { severity: "warning", kind: "shopify-variant-dependency", row: 1, column: "Option1 name / Option1 value", message: "Variant-related fields are present, but one or both Option1 columns are missing.", suggestion: "Shopify documents a dependency between variant fields and option columns. Check the current Shopify CSV guide before updating; omitting option fields in some updates can create a default variant and delete existing variants." });
     }
-  }
-
-  const emptyRows = dataRows.filter((cells) => cells.every((cell) => blank(cell))).length;
-  const duplicateRows = issues.filter((item) => item.kind === "duplicate-row").length;
-  const errors = issues.filter((item) => item.severity === "error").length;
-  const warnings = issues.filter((item) => item.severity === "warning").length;
-  return { headers, dataRows, rowLines, issues, effectiveRules, profile, delimiter: parsed.delimiter, stats: { rows: dataRows.length, columns: headers.length, emptyRows, duplicateRows, errors, warnings } };
-}
-
-export function applySafeFixes(rows, headers, rules, { trim = false, removeEmpty = false } = {}) {
-  return rows
-    .filter((cells) => !(removeEmpty && cells.every((cell) => blank(cell))))
-    .map((cells) => cells.map((cell, i) => trim && rules[headers[i]]?.trim ? String(cell ?? "").trim() : String(cell ?? "")));
-}
-
-export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false } = {}) {
-  return rows.map((row) => row.map((value) => {
-    let text = String(value ?? "");
-    // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
-    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
-    return text.includes('"') || text.includes("\n") || text.includes("\r") || text.includes(delimiter)
-      ? '"' + text.replace(/"/g, '""') + '"'
-      : text;
   }).join(delimiter)).join("\r\n");
 }
 
@@ -294,13 +271,13 @@ export function makeDefaultRules(headers, profile = "general") {
     if (price) rules[price] = { ...rules[price], type: "number", min: "0", trim: true };
   }
   if (profile === "shopify") {
-    const handle = find(/url handle/i);
+    const handle = find(/^(url handle|handle)$/i);
     const title = find(/^title$/i);
     if (handle) rules[handle] = { ...rules[handle], type: "text", trim: true };
     if (title) rules[title] = { ...rules[title], type: "text", trim: true };
-    const sku = find(/variant\s+sku/i);
+    const sku = find(/^(sku|variant\s+sku)$/i);
     if (sku) rules[sku] = { ...rules[sku], type: "text", trim: true };
-    const price = find(/variant\s+price/i);
+    const price = find(/^(price|variant\s+price)$/i);
     if (price) rules[price] = { ...rules[price], type: "number", min: "0", trim: true };
   }
   return rules;
