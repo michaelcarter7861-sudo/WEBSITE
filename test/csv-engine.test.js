@@ -68,12 +68,11 @@ test("numeric validation rejects malformed comma grouping but accepts valid grou
   assert.deepEqual(invalidIntegerRows, [3, 4]);
 });
 
-test("CSV export can neutralize spreadsheet formula-like cells without changing default serialization", () => {
-  const rows = [["=1+1", "+SUM(A1:A2)", "-2+3", "@cmd", "ordinary"]];
-  assert.equal(stringifyCSV(rows), '=1+1,+SUM(A1:A2),-2+3,@cmd,ordinary');
-  assert.equal(stringifyCSV(rows, ",", { neutralizeFormulas: true }), "'=1+1,'+SUM(A1:A2),'-2+3,'@cmd,ordinary");
+test("CSV export neutralizes formulas but preserves signed numeric values", () => {
+  const rows = [["=1+1", "+SUM(A1:A2)", "-2+3", "@cmd", "ordinary", "-12.50", "+12.50"]];
+  assert.equal(stringifyCSV(rows), '=1+1,+SUM(A1:A2),-2+3,@cmd,ordinary,-12.50,+12.50');
+  assert.equal(stringifyCSV(rows, ",", { neutralizeFormulas: true }), "'=1+1,'+SUM(A1:A2),'-2+3,'@cmd,ordinary,-12.50,+12.50");
 });
-
 test("Shopify profile surfaces the documented option-column dependency", () => {
   const analysis = analyzeCSV(parseCSV("URL handle,Title,Variant SKU\nitem,Thing,sku-1"), { profile: "shopify" });
   assert.ok(analysis.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
