@@ -136,7 +136,7 @@ function validDate(value) {
 
 function normalizedNumber(value) {
   const v = String(value ?? "").trim();
-  const numericPattern = /^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\\.\d*)?|\\.\d+)(?:[eE][+-]?\d+)?$/;
+  const numericPattern = /^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
   if (!numericPattern.test(v)) return Number.NaN;
   return Number(v.replace(/,/g, ""));
 }
