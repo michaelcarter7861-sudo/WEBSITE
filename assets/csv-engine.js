@@ -136,7 +136,7 @@ function validDate(value) {
 
 function normalizedNumber(value) {
   const v = String(value ?? "").trim();
-  const numericPattern = /^[+-]?(?:(?:\\d+|\\d{1,3}(?:,\\d{3})+)(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$/;
+  const numericPattern = /^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\\.\d*)?|\\.\d+)(?:[eE][+-]?\d+)?$/;
   if (!numericPattern.test(v)) return Number.NaN;
   return Number(v.replace(/,/g, ""));
 }
@@ -147,7 +147,7 @@ function typeValid(value, type) {
   switch (type) {
     case "text": return true;
     case "number": return Number.isFinite(normalizedNumber(v));
-    case "integer": return /^[+-]?(?:\\d+|\\d{1,3}(?:,\\d{3})+)$/.test(v);
+    case "integer": return /^[+-]?(?:\d+|\d{1,3}(?:,\d{3})+)$/.test(v);
     case "email": return emailRe.test(v);
     case "url": return urlRe.test(v);
     case "date": return validDate(v);
@@ -272,7 +272,7 @@ export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false
   return rows.map((row) => row.map((value) => {
     let text = String(value ?? "");
     // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
-    if (neutralizeFormulas && /^[\\u0000-\\u0020]*[=+\\-@]/.test(text)) text = `'${text}`;
+    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\\-@]/.test(text)) text = `'${text}`;
     return text.includes('"') || text.includes("\\n") || text.includes("\\r") || text.includes(delimiter)
       ? `"${text.replace(/"/g, '""')}"`
       : text;
