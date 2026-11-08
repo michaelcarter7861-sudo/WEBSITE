@@ -163,3 +163,11 @@ test("comparison reports blank keys and rejects malformed rows or invalid key co
   assert.throws(() => compareCSVData({ headers: ["SKU", "Price"], rows: [["A"]] }, incoming, 0, 0), /different number of fields/);
   assert.throws(() => compareCSVData(baseline, incoming, 3, 0), /valid key column/);
 });
+
+
+test("comparison reports each row in a three-or-more duplicate-key group exactly once", () => {
+  const baseline = { headers: ["SKU", "Price"], rows: [["A", "10"], ["DUP", "20"], ["DUP", "21"], ["DUP", "22"]] };
+  const incoming = { headers: ["SKU", "Price"], rows: [["A", "10"]] };
+  const result = compareCSVData(baseline, incoming, 0, 0);
+  assert.deepEqual(result.duplicateKeys.map((item) => item.row), [3, 4, 5]);
+});
