@@ -272,11 +272,11 @@ export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false
   return rows.map((row) => row.map((value) => {
     let text = String(value ?? "");
     // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
-    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\\-@]/.test(text)) text = `'${text}`;
-    return text.includes('"') || text.includes("\\n") || text.includes("\\r") || text.includes(delimiter)
-      ? `"${text.replace(/"/g, '""')}"`
+    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
+    return text.includes('"') || text.includes("\n") || text.includes("\r") || text.includes(delimiter)
+      ? '"' + text.replace(/"/g, '""') + '"'
       : text;
-  }).join(delimiter)).join("\\r\\n");
+  }).join(delimiter)).join("\r\n");
 }
 
 export function makeDefaultRules(headers, profile = "general") {
