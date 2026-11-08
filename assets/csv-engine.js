@@ -249,7 +249,7 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
     }
     const option1Name = headerMap.has("option1 name");
     const option1Value = headerMap.has("option1 value");
-    const variantFieldPresent = headers.some((name) => /^(sku|price|weight value \(grams\)|barcode|variant\s+(sku|price|grams|weight|barcode))$/i.test(name.trim()));
+    const variantFieldPresent = headers.some((name) => /^(sku|price|weight value \(grams\)|barcodes?|variant\s+(sku|price|grams|weight|barcodes?))$/i.test(name.trim()));
     if (variantFieldPresent && (!option1Name || !option1Value)) {
       addIssue(issues, { severity: "warning", kind: "shopify-variant-dependency", row: 1, column: "Option1 name / Option1 value", message: "Variant-related fields are present, but one or both Option1 columns are missing.", suggestion: "Shopify documents a dependency between variant fields and option columns. Check the current Shopify CSV guide before updating; omitting option fields in some updates can create a default variant and delete existing variants." });
     }
