@@ -57,6 +57,23 @@ test("validates user-selected types, uniqueness, and strict ISO calendar dates",
   assert.ok(analysis.issues.some((issue) => issue.kind === "type" && issue.column === "email"));
 });
 
+test("numeric validation rejects malformed comma grouping but accepts valid grouped values", () => {
+  const analysis = analyzeCSV(
+    parseCSV('amount,whole\\n"1,234.50","1,234"\\n"1,2","1,2"\\n"12,34.5","12,34"'),
+    { hasHeader: true, rules: { amount: { type: "number" }, whole: { type: "integer" } } }
+  );
+  const invalidAmountRows = analysis.issues.filter((issue) => issue.kind === "type" && issue.column === "amount").map((issue) => issue.row);
+  const invalidIntegerRows = analysis.issues.filter((issue) => issue.kind === "type" && issue.column === "whole").map((issue) => issue.row);
+  assert.deepEqual(invalidAmountRows, [3, 4]);
+  assert.deepEqual(invalidIntegerRows, [3, 4]);
+});
+
+test("CSV export can neutralize spreadsheet formula-like cells without changing default serialization", () => {
+  const rows = [["=1+1", "+SUM(A1:A2)", "-2+3", "@cmd", "ordinary"]];
+  assert.equal(stringifyCSV(rows), '=1+1,+SUM(A1:A2),-2+3,@cmd,ordinary');
+  assert.equal(stringifyCSV(rows, ",", { neutralizeFormulas: true }), "'=1+1,'+SUM(A1:A2),'-2+3,'@cmd,ordinary");
+});
+
 test("Shopify profile surfaces the documented option-column dependency", () => {
   const analysis = analyzeCSV(parseCSV("URL handle,Title,Variant SKU\nitem,Thing,sku-1"), { profile: "shopify" });
   assert.ok(analysis.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
