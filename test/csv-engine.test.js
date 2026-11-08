@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   analyzeCSV,
+  compareCSVData,
   applySafeFixes,
   makeDefaultRules,
   parseCSV,
@@ -121,4 +122,44 @@ test("Shopify profile recognizes current plural Barcodes and legacy Variant Barc
   assert.ok(current.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
   const legacy = analyzeCSV(parseCSV("Handle,Title,Variant Barcode\nitem,Thing,123"), { profile: "shopify" });
   assert.ok(legacy.issues.some((issue) => issue.kind === "shopify-variant-dependency"));
+});
+
+test("comparison excludes duplicate keys from all automatic matching and additions/removals", () => {
+  const baseline = {
+    headers: ["SKU", "Price"],
+    rows: [["A", "10"], ["DUP", "20"], ["DUP", "21"], ["OLD", "5"]]
+  };
+  const incoming = {
+    headers: ["sku", "Price"],
+    rows: [["A", "10"], ["DUP", "25"], ["NEW", "7"]]
+  };
+  const result = compareCSVData(baseline, incoming, 0, 0);
+  assert.deepEqual(result.added, [{ key: "NEW" }]);
+  assert.deepEqual(result.removed, [{ key: "OLD" }]);
+  assert.deepEqual(result.changes, []);
+  assert.equal(result.unchanged, 1);
+  assert.deepEqual(result.duplicateKeys.map((item) => [item.side, item.key, item.row]), [
+    ["baseline", "DUP", 3],
+    ["baseline", "DUP", 4]
+  ]);
+});
+
+test("comparison maps differently named key columns and matches common headers case-insensitively", () => {
+  const baseline = { headers: ["Product Code", "Cost", "Old Note"], rows: [["A-1", "4.00", "x"], ["B-2", "5.00", "y"]] };
+  const incoming = { headers: ["SKU", "cost", "New Note"], rows: [["A-1", "4.50", "z"], ["C-3", "6.00", "w"]] };
+  const result = compareCSVData(baseline, incoming, 0, 0);
+  assert.deepEqual(result.changes, [{ status: "changed", key: "A-1", column: "Cost", before: "4.00", after: "4.50" }]);
+  assert.deepEqual(result.added, [{ key: "C-3" }]);
+  assert.deepEqual(result.removed, [{ key: "B-2" }]);
+  assert.deepEqual(result.addedHeaders, ["SKU", "New Note"]);
+  assert.deepEqual(result.removedHeaders, ["Product Code", "Old Note"]);
+});
+
+test("comparison reports blank keys and rejects malformed rows or invalid key columns", () => {
+  const baseline = { headers: ["SKU", "Price"], rows: [["", "10"], ["A", "12"]] };
+  const incoming = { headers: ["SKU", "Price"], rows: [["A", "12"]] };
+  const result = compareCSVData(baseline, incoming, 0, 0);
+  assert.ok(result.duplicateKeys.some((item) => item.reason === "blank key" && item.row === 2));
+  assert.throws(() => compareCSVData({ headers: ["SKU", "Price"], rows: [["A"]] }, incoming, 0, 0), /different number of fields/);
+  assert.throws(() => compareCSVData(baseline, incoming, 3, 0), /valid key column/);
 });
