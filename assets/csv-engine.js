@@ -272,7 +272,8 @@ export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false
   return rows.map((row) => row.map((value) => {
     let text = String(value ?? "");
     // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
-    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
+    const numericSign = /^[\u0000-\u0020]*[+-]/.test(text) && Number.isFinite(normalizedNumber(text));
+    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\-@]/.test(text) && !numericSign) text = "'" + text;
     return text.includes('"') || text.includes("\n") || text.includes("\r") || text.includes(delimiter)
       ? '"' + text.replace(/"/g, '""') + '"'
       : text;
