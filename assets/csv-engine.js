@@ -253,6 +253,29 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
     if (variantFieldPresent && (!option1Name || !option1Value)) {
       addIssue(issues, { severity: "warning", kind: "shopify-variant-dependency", row: 1, column: "Option1 name / Option1 value", message: "Variant-related fields are present, but one or both Option1 columns are missing.", suggestion: "Shopify documents a dependency between variant fields and option columns. Check the current Shopify CSV guide before updating; omitting option fields in some updates can create a default variant and delete existing variants." });
     }
+  }
+
+  const emptyRows = dataRows.filter((cells) => cells.every((cell) => blank(cell))).length;
+  const duplicateRows = issues.filter((item) => item.kind === "duplicate-row").length;
+  const errors = issues.filter((item) => item.severity === "error").length;
+  const warnings = issues.filter((item) => item.severity === "warning").length;
+  return { headers, dataRows, rowLines, issues, effectiveRules, profile, delimiter: parsed.delimiter, stats: { rows: dataRows.length, columns: headers.length, emptyRows, duplicateRows, errors, warnings } };
+}
+
+export function applySafeFixes(rows, headers, rules, { trim = false, removeEmpty = false } = {}) {
+  return rows
+    .filter((cells) => !(removeEmpty && cells.every((cell) => blank(cell))))
+    .map((cells) => cells.map((cell, i) => trim && rules[headers[i]]?.trim ? String(cell ?? "").trim() : String(cell ?? "")));
+}
+
+export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false } = {}) {
+  return rows.map((row) => row.map((value) => {
+    let text = String(value ?? "");
+    // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
+    if (neutralizeFormulas && /^[\u0000-\u0020]*[=+\-@]/.test(text)) text = "'" + text;
+    return text.includes('"') || text.includes("\n") || text.includes("\r") || text.includes(delimiter)
+      ? '"' + text.replace(/"/g, '""') + '"'
+      : text;
   }).join(delimiter)).join("\r\n");
 }
 
