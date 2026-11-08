@@ -134,13 +134,20 @@ function validDate(value) {
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
+function normalizedNumber(value) {
+  const v = String(value ?? "").trim();
+  const numericPattern = /^[+-]?(?:(?:\\d+|\\d{1,3}(?:,\\d{3})+)(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$/;
+  if (!numericPattern.test(v)) return Number.NaN;
+  return Number(v.replace(/,/g, ""));
+}
+
 function typeValid(value, type) {
   const v = String(value ?? "").trim();
   if (v === "") return true;
   switch (type) {
     case "text": return true;
-    case "number": return v !== "" && Number.isFinite(Number(v.replace(/,/g, "")));
-    case "integer": return /^[-+]?\d+$/.test(v.replace(/,/g, ""));
+    case "number": return Number.isFinite(normalizedNumber(v));
+    case "integer": return /^[+-]?(?:\\d+|\\d{1,3}(?:,\\d{3})+)$/.test(v);
     case "email": return emailRe.test(v);
     case "url": return urlRe.test(v);
     case "date": return validDate(v);
@@ -214,7 +221,7 @@ export function analyzeCSV(parsed, { hasHeader = true, profile = "general", rule
       if (rule.required && blank(value)) addIssue(issues, { severity: "error", kind: "required", row: lineNo, column: name, message: `Required value is missing in “${name}”.`, suggestion: "Add a value or decide whether this field should be required for this file." });
       if (rule.trim && value !== value.trim() && !blank(value)) addIssue(issues, { severity: "warning", kind: "whitespace", row: lineNo, column: name, message: `“${name}” has leading or trailing spaces.`, suggestion: "Preview a trim before exporting; check that spaces are not meaningful in this field." });
       if (rule.type !== "none" && !blank(value) && !typeValid(value, rule.type)) addIssue(issues, { severity: "error", kind: "type", row: lineNo, column: name, message: `Value in “${name}” does not match the selected ${rule.type} format.`, suggestion: "Review the value and the chosen rule; date formats can vary by locale." });
-      const numberValue = Number(value.trim().replace(/,/g, ""));
+      const numberValue = normalizedNumber(value);
       if (!blank(value) && rule.min !== "" && Number.isFinite(numberValue) && numberValue < Number(rule.min)) addIssue(issues, { severity: "warning", kind: "range", row: lineNo, column: name, message: `Value in “${name}” is below the chosen minimum (${rule.min}).`, suggestion: "Check this range against the destination's own rules." });
       if (!blank(value) && rule.max !== "" && Number.isFinite(numberValue) && numberValue > Number(rule.max)) addIssue(issues, { severity: "warning", kind: "range", row: lineNo, column: name, message: `Value in “${name}” is above the chosen maximum (${rule.max}).`, suggestion: "Check this range against the destination's own rules." });
       if (!blank(value) && rule.allowed.trim()) {
@@ -261,13 +268,15 @@ export function applySafeFixes(rows, headers, rules, { trim = false, removeEmpty
     .map((cells) => cells.map((cell, i) => trim && rules[headers[i]]?.trim ? String(cell ?? "").trim() : String(cell ?? "")));
 }
 
-export function stringifyCSV(rows, delimiter = ",") {
+export function stringifyCSV(rows, delimiter = ",", { neutralizeFormulas = false } = {}) {
   return rows.map((row) => row.map((value) => {
-    const text = String(value ?? "");
-    return text.includes('"') || text.includes("\n") || text.includes("\r") || text.includes(delimiter)
+    let text = String(value ?? "");
+    // Prefix spreadsheet formula-like cells in exported files; this changes only the downloaded copy.
+    if (neutralizeFormulas && /^[\\u0000-\\u0020]*[=+\\-@]/.test(text)) text = `'${text}`;
+    return text.includes('"') || text.includes("\\n") || text.includes("\\r") || text.includes(delimiter)
       ? `"${text.replace(/"/g, '""')}"`
       : text;
-  }).join(delimiter)).join("\r\n");
+  }).join(delimiter)).join("\\r\\n");
 }
 
 export function makeDefaultRules(headers, profile = "general") {
