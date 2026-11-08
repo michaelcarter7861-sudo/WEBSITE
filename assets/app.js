@@ -257,7 +257,7 @@ function rowsForExport() {
 $("download-csv-button").addEventListener("click", () => {
   if (!state.analysis) return;
   const extension = state.parsed.delimiter === "\t" ? "tsv" : "csv";
-  const content = stringifyCSV(rowsForExport(), state.parsed.delimiter);
+  const content = stringifyCSV(rowsForExport(), state.parsed.delimiter, { neutralizeFormulas: true });
   downloadFile(`${safeBaseName(state.file?.name)}-rowready.${extension}`, content, extension === "tsv" ? "text/tab-separated-values;charset=utf-8" : "text/csv;charset=utf-8");
 });
 $("download-report-button").addEventListener("click", () => {
@@ -341,7 +341,10 @@ function parseCompareFile(file) {
     const parsed = parseCSV(text, "auto");
     if (parsed.syntaxIssues.some((item) => item.severity === "error")) throw new Error(`There are quoting issues in ${file.name}. Fix the CSV structure before comparing.`);
     if (parsed.rows.length < 2) throw new Error(`${file.name} needs a header row and at least one data row.`);
-    return { file, parsed, headers: parsed.rows[0].map((name, index) => String(name ?? "").trim() || `Unnamed column ${index + 1}`), rows: parsed.rows.slice(1).filter((row) => row.some((value) => String(value ?? "").trim() !== "")) };
+    const headers = parsed.rows[0].map((name, index) => String(name ?? "").trim() || `Unnamed column ${index + 1}`);
+    const malformedRow = parsed.rows.slice(1).findIndex((row) => row.length !== headers.length);
+    if (malformedRow >= 0) throw new Error(`${file.name} contains a row with a different number of fields than its header (file row ${malformedRow + 2}). Fix the structure before comparing.`);
+    return { file, parsed, headers, rows: parsed.rows.slice(1).filter((row) => row.some((value) => String(value ?? "").trim() !== "")) };
   });
 }
 function fillKeySelectors() {
@@ -437,7 +440,7 @@ $("download-diff-button").addEventListener("click", () => {
   if (!state.comparison) return;
   const c = state.comparison;
   const rows = [["status", "key", "column", "before", "after"], ...c.added.map((x) => ["new", x.key, "", "", ""]), ...c.removed.map((x) => ["missing from incoming", x.key, "", "", ""]), ...c.changes.map((x) => ["changed", x.key, x.column, x.before, x.after]), ...c.addedHeaders.map((column) => ["new column", "", column, "", ""]), ...c.removedHeaders.map((column) => ["removed column", "", column, "", ""]), ...c.duplicateKeys.map((x) => [x.reason, x.key, x.side, "", ""])];
-  downloadFile("rowready-change-review.csv", stringifyCSV(rows), "text/csv;charset=utf-8");
+  downloadFile("rowready-change-review.csv", stringifyCSV(rows, ",", { neutralizeFormulas: true }), "text/csv;charset=utf-8");
 });
 
 // Compare uploads are local too; keep the privacy boundary visible if a file read fails.
