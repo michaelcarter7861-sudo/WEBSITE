@@ -15,7 +15,7 @@ Open `http://localhost:3000`. The development server serves the project root. Th
 
 ## Static hosting
 
-The connected `michaelcarter7861-sudo/WEBSITE` repository is prepared for free GitHub Pages publication as a static project site. `.github/workflows/pages.yml` builds `dist/` and publishes it when `main` changes, but Pages is not yet enabled in repository settings; set the Pages source to **GitHub Actions**. The expected project-site address is `https://michaelcarter7861-sudo.github.io/WEBSITE/`, based on GitHub's documented project URL pattern; verify the actual URL in repository Pages settings after deployment.
+The `michaelcarter7861-sudo/WEBSITE` repository is published as a GitHub Pages project site. `.github/workflows/pages.yml` builds `dist/` and deploys it when `main` changes; the latest verified deployment completed successfully. The public project-site address is `https://michaelcarter7861-sudo.github.io/WEBSITE/`.
 
 - GitHub Actions build command: `npm run build`
 - GitHub Actions artifact directory: `dist`
