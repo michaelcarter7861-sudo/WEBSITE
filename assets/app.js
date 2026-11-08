@@ -1,4 +1,4 @@
-import { analyzeCSV, applySafeFixes, makeDefaultRules, makeSampleCSV, parseCSV, stringifyCSV } from "./csv-engine.js";
+import { analyzeCSV, applySafeFixes, compareCSVData, makeDefaultRules, makeSampleCSV, parseCSV, stringifyCSV } from "./csv-engine.js";
 
 const $ = (id) => document.getElementById(id);
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -381,38 +381,15 @@ $("incoming-input").addEventListener("change", async (event) => {
 function compareFiles() {
   if (!state.baseline || !state.incoming) return;
   $("compare-error").hidden = true;
-  const bKeyIndex = Number($("baseline-key").value);
-  const nKeyIndex = Number($("incoming-key").value);
-  const baseKeyName = state.baseline.headers[bKeyIndex];
-  const incomingKeyName = state.incoming.headers[nKeyIndex];
-  const baselineMap = new Map(); const incomingMap = new Map();
-  const duplicateKeys = [];
-  const addRows = (entries, rows, keyIndex, source) => {
-    rows.forEach((row, index) => {
-      const key = String(row[keyIndex] ?? "").trim();
-      if (!key) { duplicateKeys.push({ side: source, key: "", row: index + 2, reason: "blank key" }); return; }
-      if (entries.has(key)) { duplicateKeys.push({ side: source, key, row: index + 2, reason: "duplicate key" }); return; }
-      entries.set(key, row);
-    });
-  };
-  addRows(baselineMap, state.baseline.rows, bKeyIndex, "baseline");
-  addRows(incomingMap, state.incoming.rows, nKeyIndex, "incoming");
-  const commonColumns = state.baseline.headers.map((name, index) => ({ name, index, other: state.incoming.headers.findIndex((item) => item.trim().toLowerCase() === name.trim().toLowerCase()) })).filter((item) => item.other >= 0);
-  const added = []; const removed = []; const changes = [];
-  for (const [key, row] of incomingMap) {
-    if (!baselineMap.has(key)) { added.push({ key }); continue; }
-    const before = baselineMap.get(key);
-    for (const column of commonColumns) {
-      if (column.index === bKeyIndex || column.other === nKeyIndex) continue;
-      const oldValue = String(before[column.index] ?? "");
-      const newValue = String(row[column.other] ?? "");
-      if (oldValue !== newValue) changes.push({ status: "changed", key, column: column.name, before: oldValue, after: newValue });
-    }
+  try {
+    const bKeyIndex = Number($("baseline-key").value);
+    const nKeyIndex = Number($("incoming-key").value);
+    state.comparison = compareCSVData(state.baseline, state.incoming, bKeyIndex, nKeyIndex);
+    renderComparison();
+  } catch (error) {
+    state.comparison = null;
+    showCompareError("Files could not be compared.", error?.message || "Review the selected key columns and file structure.");
   }
-  for (const key of baselineMap.keys()) if (!incomingMap.has(key)) removed.push({ key });
-  const changedRecords = new Set(changes.map((item) => item.key)).size;
-  state.comparison = { added, removed, changes, changedRecords, unchanged: Math.max(0, [...baselineMap.keys()].filter((key) => incomingMap.has(key)).length - changedRecords), duplicateKeys, baselineCount: state.baseline.rows.length, incomingCount: state.incoming.rows.length, baseKeyName, incomingKeyName, baselineHeaders: state.baseline.headers, incomingHeaders: state.incoming.headers, addedHeaders: state.incoming.headers.filter((header) => !state.baseline.headers.some((item) => item.toLowerCase() === header.toLowerCase())), removedHeaders: state.baseline.headers.filter((header) => !state.incoming.headers.some((item) => item.toLowerCase() === header.toLowerCase())) };
-  renderComparison();
 }
 function showCompareError(title, message) {
   $("compare-error-title").textContent = title;
